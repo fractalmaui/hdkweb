@@ -1,0 +1,292 @@
+
+
+//======(Hue-Do-Ku)==========================================
+// Attempts to solve the game for 8 outcomes....
+// Assumes a SQUARE puzzle always!
+//   First, looks for two corners that are in any matching
+//   configuration, tests top L/R first.  Determines whih
+//   of the eight puzzle types it is and then does a
+//   brute-force test against the apropriate results
+//   (All 8 correct results are canned at puzzle init time)
+this.testGameSolution = function()
+{
+    var ival,cornercount,gotdiagonal = 0;
+    var gotA,gotB,gotC,gotD = 0;
+    var solution = 0; //0 is FAIL
+    
+    console.Log(" testGameSolution...");
+    //clear validation bins...
+    for (var loop=0;loop<this.totalSize;loop++)
+    {
+        this.tiles[loop].ok = false;
+    }
+        
+    //OK, now we need to see if any corners are in place (at all)
+    ival = this.indices[Aindex]; //get A corner (top left)
+    // is this one of our corners? (just means _A_ corner is present not the correct one!)
+    if (ival == Aindex || ival == Bindex || ival == Cindex || ival == Dindex)
+    {
+        gotA = 1 + ival;
+        cornercount++;
+    }
+    //  repeat for B,C,D
+    ival = this.indices[Bindex]; //get B corner (top right)
+    if (ival == Aindex || ival == Bindex || ival == Cindex || ival == Dindex)
+    {
+        gotB = 1 + ival;
+        cornercount++;
+    }
+    ival = this.indices[Cindex]; //get C corner (top right)
+    if (ival == Aindex || ival == Bindex || ival == Cindex || ival == Dindex)
+    {
+        gotC = 1 + ival;
+        cornercount++;
+    }
+    ival = this.indices[Dindex]; //get D corner (top right)
+    if (ival == Aindex || ival == Bindex || ival == Cindex || ival == Dindex)
+    {
+        gotD = 1 + ival;
+        cornercount++;
+    }
+    
+    //OK! If we have two or more corners, determine which of the 8 solutions
+    //      the puzzle most closely resembles....
+    if (cornercount >= 2)
+    {
+        //Check top left/right:
+        if (gotA!=0 && gotB!=0)
+        {
+            if ((this.indices[Aindex] == Aindex)      && (this.indices[Bindex] == Bindex))
+            {
+                solution = SOLUTION_AB1;
+            }
+            else if ((this.indices[Aindex] == Bindex) && (this.indices[Bindex] == Cindex))
+            {
+                solution = SOLUTION_AB2;
+            }
+            else if ((this.indices[Aindex] == Cindex) && (this.indices[Bindex] == Dindex))
+            {
+                solution = SOLUTION_AB3;
+            }
+            else if ((this.indices[Aindex] == Dindex) && (this.indices[Bindex] == Aindex))
+            {
+                solution = SOLUTION_AB4;
+            }
+            //Mirrored...
+            else if ((this.indices[Aindex] == Bindex) && (this.indices[Bindex] == Aindex))
+            {
+                solution = SOLUTION_BA1;
+            }
+            else if ((this.indices[Aindex] == Aindex) && (this.indices[Bindex] == Dindex))
+            {
+                solution = SOLUTION_BA2;
+            }
+            else if ((this.indices[Aindex] == Dindex) && (this.indices[Bindex] == Cindex))
+            {
+                solution = SOLUTION_BA3;
+            }
+            else if ((this.indices[Aindex] == Cindex) && (this.indices[Bindex] == Bindex))
+            {
+                solution = SOLUTION_BA4;
+            }
+            
+        } //end gotAB
+        else if (gotB!=0 && gotC!=0) //check top/bottom right in place
+        {
+            if ((this.indices[Bindex] == Bindex)      && (this.indices[Cindex] == Cindex))
+            {
+                solution = SOLUTION_AB1;
+            }
+            else if ((this.indices[Bindex] == Cindex) && (this.indices[Cindex] == Dindex))
+            {
+                solution = SOLUTION_AB2;
+            }
+            else if ((this.indices[Bindex] == Dindex) && (this.indices[Cindex] == Aindex))
+            {
+                solution = SOLUTION_AB3;
+            }
+            else if ((this.indices[Bindex] == Aindex) && (this.indices[Cindex] == Bindex))
+            {
+                solution = SOLUTION_AB4;
+            }
+            else if ((this.indices[Bindex] == Aindex) && (this.indices[Cindex] == Dindex))
+            {
+                solution = SOLUTION_BA1;
+            }
+            else if ((this.indices[Bindex] == Dindex) && (this.indices[Cindex] == Cindex))
+            {
+                solution = SOLUTION_BA2;
+            }
+            else if ((this.indices[Bindex] == Cindex) && (this.indices[Cindex] == Bindex))
+            {
+                solution = SOLUTION_BA3;
+            }
+            else if ((this.indices[Bindex] == Bindex) && (this.indices[Cindex] == Aindex))
+            {
+                solution = SOLUTION_BA4;
+            }
+        }  //end gotBC
+        else if (gotC!=0 && gotD!=0)
+        {
+            if ((this.indices[Cindex] == Cindex)      && (this.indices[Dindex] == Dindex))
+            {
+                solution = SOLUTION_AB1;
+            }
+            else if ((this.indices[Cindex] == Dindex) && (this.indices[Dindex] == Aindex))
+            {
+                solution = SOLUTION_AB2;
+            }
+            else if ((this.indices[Cindex] == Aindex) && (this.indices[Dindex] == Bindex))
+            {
+                solution = SOLUTION_AB3;
+            }
+            else if ((this.indices[Cindex] == Bindex) && (this.indices[Dindex] == Cindex))
+            {
+                solution = SOLUTION_AB4;
+            }
+            else if ((this.indices[Cindex] == Dindex) && (this.indices[Dindex] == Cindex))
+            {
+                solution = SOLUTION_BA1;
+            }
+            else if ((this.indices[Cindex] == Cindex) && (this.indices[Dindex] == Bindex))
+            {
+                solution = SOLUTION_BA2;
+            }
+            else if ((this.indices[Cindex] == Bindex) && (this.indices[Dindex] == Aindex))
+            {
+                solution = SOLUTION_BA3;
+            }
+            else if ((this.indices[Cindex] == Aindex) && (this.indices[Dindex] == Dindex))
+            {
+                solution = SOLUTION_BA4;
+            }
+        }   //end gotCD
+        else if (gotD!=0 && gotA!=0)
+        {
+            if ((this.indices[Dindex] == Dindex)      && (this.indices[Aindex] == Aindex))
+            {
+                solution = SOLUTION_AB1;
+            }
+            else if ((this.indices[Dindex] == Aindex) && (this.indices[Aindex] == Bindex))
+            {
+                solution = SOLUTION_AB2;
+            }
+            else if ((this.indices[Dindex] == Bindex) && (this.indices[Aindex] == Cindex))
+            {
+                solution = SOLUTION_AB3;
+            }
+            else if ((this.indices[Dindex] == Cindex) && (this.indices[Aindex] == Dindex))
+            {
+                solution = SOLUTION_AB4;
+            }
+            else if ((this.indices[Dindex] == Cindex) && (this.indices[Aindex] == Bindex))
+            {
+                solution = SOLUTION_BA1;
+            }
+            else if ((this.indices[Dindex] == Bindex) && (this.indices[Aindex] == Aindex))
+            {
+                solution = SOLUTION_BA2;
+            }
+            else if ((this.indices[Dindex] == Aindex) && (this.indices[Aindex] == Dindex))
+            {
+                solution = SOLUTION_BA3;
+            }
+            else if ((this.indices[Dindex] == Dindex) && (this.indices[Aindex] == Cindex))
+            {
+                solution = SOLUTION_BA4;
+            }
+        } //end gotDA
+        
+        solutionGuess = solution;
+    } //end cornercount
+    
+    // If we have ONE corner in place, look at its XY neighbors and see if any of
+    //   our 8 solutions is being tried at.  Just takes 2 neighbors to get a match...
+    if (solution==0 && (gotA!=0 || gotB!=0 || gotC!=0 || gotD!=0))
+        {
+            var v,w,i,xdir,ydir,nx,ny = 0;
+            var bing = false;
+            w = this.size;
+            for (var c = 0;c<4;c++) //Loop over 4 corners
+            {
+                switch (c)
+                {
+                    case 0: //Top Left
+                        if (gotA!=0)
+                        {
+                            v = gotA - 1; i = 0;
+                            xdir = 1; ydir = 1;
+                            bing = true;
+                        }
+                        break;
+                    case 1: //Top Right
+                        if (gotB!=0)
+                        {
+                            v = gotB - 1; i = w-1;
+                            xdir = -1; ydir = 1;
+                            bing = true;
+                        }
+                        break;
+                    case 2: //Bottom Right
+                        if (gotC!=0)
+                        {
+                            v = gotC - 1; i = w*w-1;
+                            xdir = -1; ydir = -1;
+                            bing = true;
+                        }
+                        break;
+                    case 3: //Bottom Left
+                        if (gotD!=0)
+                        {
+                            v = gotD - 1; i = w*(w-1);
+                            xdir = 1; ydir = -1;
+                            bing = true;
+                        }
+                        break;
+                } //end switch
+            } //end for c
+            ydir*=w;
+            nx = this.indices[i+xdir]; //Get x neighbor's puzzle index
+            ny = this.indices[i+ydir]; //    y neighbor
+            if (bing) for (var loop=0;loop<8;loop++)
+            {
+                var ptr8 = loop * this.totalSize;
+                if (v == this.solutions8[ptr8 + i] && nx == this.solutions8[ptr8 + i+xdir]) // Check for 2 in a row along x
+                    {solution = 1+loop; break;}                                          // Match!
+                else if (v == this.solutions8[ptr8 + i] && ny == this.solutions8[ptr8 + i + ydir]) //    ...or 2 in a row along y
+                    {solution = 1+loop; break;}                                               // Match!
+            } //end loop
+        } //end big if
+    
+    //Based on assumed solution user is trying to get at, check tiles for
+    //  proper ordering, be it up/down/right/left...
+    var okcount = 0;
+    var sminusone = solution - 1; //Valid solution #'s are 1...8 but solution array is 0..7
+    var ptr8 = sminusone * this.totalSize;
+    if (solution > 0) for (var loop=0;loop<this.totalSize;loop++)
+    {
+        if (this.indices[loop] == this.solutions8[ptr8 + loop])
+        {
+            okcount++;
+            this.tiles[loop].ok = true;
+        }
+        
+    } //end loop
+    if (okcount == this.totalSize) return solution;
+    return 0;
+} //end testGameSolution
+
+
+//——GameObj——————————————————
+// Creates a 2D array???
+function createArray(length) {
+    var arr = new Array(length || 0),
+        i = length;
+
+    if (arguments.length > 1) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        while(i--) arr[length-1 - i] = createArray.apply(this, args);
+    }
+
+    return arr;
+}
