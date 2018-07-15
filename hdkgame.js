@@ -106,9 +106,9 @@ function Tile (index,color,w,h) {
        {
            c.drawImage(cglints[this.cgframe],x,y,this.w,this.h);
        }
-      
-      c.fillStyle = "#000000";
-      c.fillText(this.index, x+20, y+20); 
+      //Add tile numbers if needed
+      //c.fillStyle = "#000000";
+      //c.fillText(this.index, x+20, y+20); 
 
       this.wasok = this.ok;
     }
