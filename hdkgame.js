@@ -9,6 +9,12 @@
 // July 14: Integrate with HDKAnim.js, add SFX         
 // For puzzle draw AFTER shuffle:
 //  https://stackoverflow.com/questions/43183026/what-is-the-simplest-way-of-chaining-together-animations-using-promises
+// GIT Cheat Sheet:
+// Repo: https://github.com/fractalmaui/hdkweb
+//   git add .
+//   git commit -m "5x5 cleanup" .
+//   git push -u origin master
+//
 
 
 var canvas = document.querySelector("canvas");
@@ -17,7 +23,7 @@ var oldY = -999;
 var selectXOff = 0;
 var selectYOff = 0;
 var mousePressed  = false;
-var puzzlePixelSize = 360;  //Overall puzzle XY size
+var puzzlePixelSize = 512;  //Overall puzzle XY size
 var headerSize = 120;  //Top of puzzle header
 var startTime, endTime;
 var logoImage = new Image();
@@ -162,6 +168,7 @@ var game = new function() {
     this.moves      = 0;
     this.started    = false;
     this.over       = false;
+    this.refresh    = false;
     this.selected   = -1;
     this.swap1      = -1;  //Which two tiles are getting swapped
     this.swap2      = -1;
@@ -732,6 +739,19 @@ this.testGameSolution = function()
    }
 
     //——GameObj——————————————————
+   this.scrambleAnim = function()
+   {
+  	HDKAnim.clear();
+   	HDKAnim.buildPuzzle(); 
+   	HDKAnim.buildShuffle(game.indices);
+   	HDKAnim.addKeyframe(0.0);
+   	HDKAnim.addKeyframe(1.0);
+   	HDKAnim.addKeyframe(-1);
+   	HDKAnim.animFrames = 30;
+   	HDKAnim.animFunc = EasingFunctions.easeInOutCubic;
+   }
+
+    //——GameObj——————————————————
    this.updateAnimations = function()
    {
      if (this.swap2 != -1)
@@ -783,7 +803,7 @@ this.testGameSolution = function()
 //—-(main)————————————————————————
 function mouseDown(e) {
 //    if (game.over) return;
-    if (!game.started || game.over) //First click? Scramble!
+    if (!game.started || game.over) //First click? new game!
      {
        startNewGame();
        return;
@@ -870,7 +890,13 @@ function mouseMove(e) {
 function animate()
 {
    game.updateAnimations()
-   HDKAnim.updateAnimations();
+   if (!HDKAnim.animDone) HDKAnim.updateAnimations();
+   else if (game.refresh) //Need to refresh puzzle?
+	{
+	game.drawPuzzle();
+	game.refresh = false;
+	}
+
    requestAnimationFrame(animate);
 }
 
@@ -909,12 +935,13 @@ function startNewGame()
    game.clear();
    game.checkTilesOK();
    game.initHistory();
-   game.drawPuzzle();
+   game.refresh = true; //Indicate we need refresh after scramble anim…
+   game.scrambleAnim();
    game.started = true;
    game.over = false;
 }
 
-    //Init glints global.  
+//Init glints global.  
     for (var i = 0; i < 13; i++) //Canned glints
     {
       var img=new Image();
@@ -927,7 +954,7 @@ function startNewGame()
 
 
 
-console.log(game);
+//console.log(game);
 game.initAllEightSolutions();
 game.setTiles();
 game.drawPuzzle();
@@ -937,19 +964,10 @@ game.drawPuzzle();
 // Set up animation object . . .
 HDKAnim.yorigin = headerSize;
 
-//NOTE! We CAN indeed see hdkanim (it’s in a different JS file!)
-if (false)
-{
-HDKAnim.clear();
-HDKAnim.buildPuzzle();
-HDKAnim.buildSmoosh();
-HDKAnim.addKeyframe(0.0);
-HDKAnim.addKeyframe(1.0);
-HDKAnim.addKeyframe(0.0);
-HDKAnim.addKeyframe(-1.0);  //end
-HDKAnim.animFrames = 60;
-HDKAnim.animFunc = EasingFunctions.easeInOutCubic;
-}
-animate();
+//Why o why can’t i set width/height here??? 
+HDKAnim.width = 512;
+HDKAnim.height = 512;
+
+animate(); //Master animation loop: also animates all child objects
 
 

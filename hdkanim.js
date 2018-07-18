@@ -3,7 +3,7 @@
 //   https://stackoverflow.com/questions/950087/how-do-i-include-a-javascript-file-in-another-javascript-file
 // CSS Animations?
 //  https://davidwalsh.name/css-animation-callback
-
+//  http://www.javascriptkit.com/javatutors/requestanimationframe.shtml
 var canvas = document.querySelector("canvas");
 var c = canvas.getContext("2d")
 
@@ -39,8 +39,8 @@ EasingFunctions = {
 
 //——HDKAnim——————————————————————————
  var HDKAnim = new function() {
-        this.width  = 360;
-        this.height = 360;
+        this.width  = 512;
+        this.height = 512;
         this.xorigin = 0;
         this.yorigin = 0;
 	this.animFrames = 30;
@@ -74,6 +74,9 @@ EasingFunctions = {
         return this.name + " " + this.type + " animation";
     };
 
+
+
+ 
    //——HDKAnim——————————————————
    this.addKeyframe = function(kf)
     {
@@ -86,7 +89,18 @@ EasingFunctions = {
         this.keyframes = [];
 	this.animating = false;
         this.animDone = false;
-    }
+        //Clear our before/after anim arrays…
+ 	this.xs = [];
+ 	this.ys = [];
+ 	this.xw = [];
+ 	this.yw = [];
+ 	this.txs = [];
+ 	this.tys = [];
+ 	this.txw = [];
+ 	this.tyw = [];
+	 
+
+    } //end clear
 
    //——HDKAnim——————————————————
      this.buildPuzzle = function()
@@ -116,10 +130,10 @@ EasingFunctions = {
        for (var i=0;i<this.totalSize;i++)  //loop over indices. . .
 	{
          var ii = indices[i];
- 	 this.txs[i] = this.xs[ii];
- 	 this.tys[i] = this.ys[ii];
- 	 this.txw[i] = this.xw[ii];
- 	 this.tyw[i] = this.yw[ii];
+ 	 this.txs[ii] = this.xs[i];
+ 	 this.tys[ii] = this.ys[i];
+ 	 this.txw[ii] = this.xw[i];
+ 	 this.tyw[ii] = this.yw[i];
 	}
     } //end buildShuffle
 
@@ -210,7 +224,9 @@ EasingFunctions = {
     //——HDKAnim——————————————————
     this.updateAnimations = function()
     {
-      if (this.animDone || (this.keyframes.length < 2)) return;
+      //console.log("dun " + this.animDone);
+      if (this.keyframes.length < 2) this.animDone = true;
+      if (this.animDone) return;
       var newkf = false;
       if (!this.animating) //starting?
 	{
@@ -235,7 +251,7 @@ EasingFunctions = {
 		}
 	  }
       if (!this.animDone) this.draw();
-    }
+    } //end updateAnimations
 
 
 
